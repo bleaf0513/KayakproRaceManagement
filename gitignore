@@ -1,0 +1,6 @@
+
+    # Ignore the 'qtcreator' folder
+   .qtcreator/
+
+    # Ignore the 'build' folder
+    build/
