@@ -2,162 +2,200 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls 2.5
+import QtQuick.Window 2.15
 import com.kayakpro.bluetooth 1.0
 ApplicationWindow {
-    visible: true
-    width: 1280
-    height: 760
+    x:0
+    y:0
+    width: Screen.width-15
+    height: Screen.height-80
+    flags: Qt.Window | Qt.WindowCloseButtonHint
+    // maximumWidth: width
+    // maximumHeight: height
+    // minimumWidth: width
+    // minimumHeight: height
     id:main_window
     title: "Setting..."
+    property int _pixelSize:main_window.height/35
     BluetoothManager {
         id: bluetoothManager
     }
     // Root Layout to split into two sections (left and right)
     Component.onCompleted: {
+        showMaximized()
+
         bluetoothManager.startScan();  // Automatically call startScan when the component is fully loaded
     }
-    // Left Field: Combo Boxes
-    Item {
-        width: 250
-        height: parent.height
-        x:parent.x+30
-        // ColumnLayout for stacking the combo boxes
-        ColumnLayout {
-            anchors.left: parent.left
-
-            width:parent.width/3
-            y:parent.height/2
-            spacing: 10
-
-            // Combo Box 1
-            ComboBox {
-                id: comboBox1
-                width: parent.width
-                model: ["select","250m","500m", "1000m", "2000m","3000m", "5000m", "7500m","10000m"]
-                onActivated: {
-                    // Disable the second combo box when one is selected
-                    comboBox2.currentIndex=0;
-                }
-
-            }
-
-            // Combo Box 2
-            ComboBox {
-                id: comboBox2
-                anchors.left: parent.left
-
-                width:parent.width/3
-                model: ["select","5min", "10min", "15min"]
-                enabled: true  // Initially disabled until comboBox1 is selected
-                onActivated: {
-                    // Disable the first combo box when one is selected
-                    comboBox1.currentIndex=0;
-                }
-            }
-            RowLayout {
-                //anchors.centerIn: parent
-                spacing: 20
-                anchors.left: parent.left
-                // Static Text
-                Text {
-                    text: "Player Number:"
-                    font.pointSize: 8
-                    font.bold: true
-                    color: "black"
-                    Layout.alignment: Qt.AlignVCenter // Align vertically in the center
-                }
-
-                // Text Input (for user input)
-                TextInput {
-                    id: nameInput
-                    width: parent.width - 20
-                    height: parent.height
-                    font.pointSize: 14
-                    color: "#333333"
-                    padding: 10
-                    //placeholderText: "Type your name"
-                    //placeholderTextColor: "#888888"
-                    // border.color: "transparent"  // Border is handled by Rectangle
-                    anchors.centerIn: parent
-
-                    // Focus Effect
-                    // onFocusedChanged: {
-                    //     if (nameInput.focus) {
-                    //         nameInput.border.color = "#007BFF";  // Focused color (blue)
-                    //     } else {
-                    //         nameInput.border.color = "transparent";
-                    //     }
-                    // }
-
-                    // Icon inside the text input
-                    Text {
-                        text: "🖊"
-                        font.pointSize: 18
-                        color: "#007BFF"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 10
-                    }
-
-                    // Handling Text Changed event
-                    onTextChanged: {
-                        console.log("Entered Text: " + nameInput.text)
-                    }
-                }
-
-                // A button to show what has been entered
-
-            }
-            Button {
-                text: "Ready?"
-                onClicked: {
-
-                    loader.source="play.qml"
-                    main_window.visible = false;
-
-                }
-            }
-        }
-
-    }
-
-    // Right Field: 10 Players (5 Rows, 2 Columns)
     GridLayout {
         columns: 2
         rows: 5
-        //spacing: 10
-        x:parent.x+parent.width/3
-        y:parent.y
-        width:parent.width*2/3
-        height:parent.height
+        x:main_window.width/3
+        y:0
+        z:19
+        rowSpacing: 0
+        columnSpacing: 0
+        width:main_window.width*2/3
+        height:main_window.height*5/5.1
         // Repeater to create 10 player sections
+
         Repeater {
             model: 10
             Rectangle {
-                width: parent.width
-                height: main_window.height/5
-                color: "lightblue"
-                border.color: "black"
-                radius: 5
+                id:player_setting_dlg
+                width: main_window.width/3
+                height: main_window.height/5.1
+                color: "transparent"
+                border.color: "blue"
+                border.width: 3
+                layer.enabled: true
+                layer.smooth: true
+                z:20
 
-                Text {
-                    text: "Player " + (index + 1)
-                    font.bold: true
-                    font.pointSize: 14
-                    anchors.centerIn: parent
-                }
+
                 Image {
                     width:56
                     height:56
                     source: "images/bluetooth.png"
 
                 }
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins:8
+                    //leftMargin:  player_setting_dlg.width/3
+                    spacing: 6
 
+                    // ------------------
+                    // Player Image & Name
+                    // ------------------
+                    RowLayout {
+                        spacing: 8
+                        Item{width:player_setting_dlg.width/4}
+                        Label { text: "Player" + (index + 1)+":"; color: "blue"; font.pixelSize: _pixelSize }
+                        TextField {
+                            id: playerName
+                            placeholderText: "Name"
+                            text: ""
+                            width: player_setting_dlg.width/3
+                            font.pixelSize: _pixelSize
+                        }
+                    }
+
+                    // ------------------
+                    // Weight Input
+                    // ------------------
+                    RowLayout {
+                        spacing: 8
+                        Item{width:player_setting_dlg.width/4}
+                        Label { text: "Weight:"; color: "blue"; font.pixelSize: _pixelSize }
+                        TextField {
+                            id: playerWeight
+                            placeholderText: "Kg"
+                            font.pixelSize: _pixelSize
+                            width: player_setting_dlg.width/4
+                            height:playerName.height
+                            inputMethodHints: Qt.ImhDigitsOnly
+                            validator: IntValidator { bottom: 30; top: 200 }  // realistic range
+                        }
+                    }
+
+                    // ------------------
+                    // Sex Input
+                    // ------------------
+                    RowLayout {
+                        spacing: 8
+                        Item{width:player_setting_dlg.width/4}
+                        Label { text: "Sex:      "; color: "blue"; font.pixelSize: _pixelSize }
+                        ComboBox {
+                            id: playerSex
+                            font.pixelSize: _pixelSize
+                            width: player_setting_dlg.width/4
+                            model: ["Male", "Female", "Other"]
+                        }
+                    }
+
+
+                }
             }
         }
     }
-    Loader {
-        id: loader
-        anchors.centerIn: parent
+
+    // Left Field: Combo Boxes
+    Item {
+        id:left_field
+        width: main_window.width/3
+        height: main_window.height
+        x:30
+        z:10
+        // ColumnLayout for stacking the combo boxes
+
+        // Combo Box 1
+        ComboBox {
+            x:left_field.width/5
+            width:left_field.width/5
+            y:left_field.height/3
+            currentIndex: 3
+            id: select_meter_combo
+            font.pixelSize: _pixelSize
+            model: ["select","250m","500m", "1000m", "2000m","3000m", "5000m", "7500m","10000m"]
+            onActivated: {
+                // Disable the second combo box when one is selected
+                select_time_combo.currentIndex=0;
+            }
+
+        }
+        Label { x:left_field.width*2.3/5;y:left_field.height/3;text: "OR"; color: "blue"; font.pixelSize: _pixelSize }
+        // Combo Box 2
+        ComboBox {
+            id: select_time_combo
+            x:left_field.width*3/5
+            y:left_field.height/3
+            width:left_field.width/5
+            model: ["select","5min", "10min", "15min"]
+            enabled: true  // Initially disabled until comboBox1 is selected
+            font.pixelSize: _pixelSize
+            onActivated: {
+                // Disable the first combo box when one is selected
+                select_meter_combo.currentIndex=0;
+            }
+        }
+
+        Label { x:left_field.width/5;y:left_field.height/30;text: "ActivePlayers:"; color: "blue"; font.pixelSize: _pixelSize }
+        Label { x:left_field.width/5+_pixelSize*9;y:left_field.height/30;text: "10"; color: "black"; font.pixelSize: _pixelSize }
+
+        // A button to show what has been entered
+
+
+        Button {
+            id:ready_but
+            text: "Ready!"
+            font.pixelSize: _pixelSize
+            x:left_field.width/2.5
+            y:left_field.height/1.4
+            onClicked: {
+
+               main_window.visible=false;
+                loader.source="Racing.qml"
+
+            }
+        }
+
+        Button {
+            id:exit_but
+            text: "Exit"
+            font.pixelSize: _pixelSize
+            x:left_field.width/2.5
+            y:ready_but.y+ready_but.height*2
+            width:ready_but.width
+
+            onClicked: {
+                Qt.quit()
+            }
+        }
+
     }
+    Loader{
+        id:loader
+    }
+
+
 }

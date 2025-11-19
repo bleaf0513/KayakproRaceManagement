@@ -2,19 +2,27 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Shapes
+import QtQuick.Window 2.15
 ApplicationWindow {
-    visible: true
+
     id:second_window
-    width: 1280
-    height: 760
+    x:0
+    y:0
+    width: Screen.width-15
+    height: Screen.height-80
+    property int _pixelSize:main_window.height/35
+    flags: Qt.Window | Qt.WindowCloseButtonHint
     title: "Racing UI"
     property int first_tab_width:width/16
     property int second_tab_width:width/16
     property int height_spacing:height/11
     property var ranking_number:[1,2,3,4,5,6,7,8,9,10]
-        property var player_name:["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","engineer"]
+    property var player_name:["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","engineer"]
     property int countdown: 10  // Start counting from 10
+    Component.onCompleted: {
+        showMaximized()
 
+    }
     Text {
         id:time_counter
         z:10
@@ -78,7 +86,7 @@ ApplicationWindow {
                     Text {
                         anchors.centerIn: parent
                         font.bold: true
-                        font.pointSize: parent.height/6
+                        font.pixelSize: _pixelSize
                         text: {
 
                             return player_name[index].toString()
@@ -92,7 +100,7 @@ ApplicationWindow {
                     Text {
                         anchors.centerIn: parent
                         font.bold: true
-                        font.pointSize: parent.height/3
+                        font.pixelSize: _pixelSize
                         text: {
 
                             return ranking_number[index].toString()
@@ -132,6 +140,29 @@ ApplicationWindow {
             dashPattern: [ 1, 4 ]
             startX: parent.x; startY: 0
             PathLine { x: parent.x; y: second_window.height-height_spacing }
+        }
+    }
+    Button {
+        id:print_but
+        text: "Print"
+        font.pixelSize: _pixelSize
+        x:second_window.width*0.7
+        y:second_window.height-height_spacing*0.8
+        onClicked: {
+
+        }
+    }
+    Button {
+        id:exit_but
+        text: "Exit"
+        font.pixelSize: _pixelSize
+        x:print_but.x+print_but.width*2
+        y:second_window.height-height_spacing*0.8
+        width:ready_but.width
+
+        onClicked: {
+            Qt.quit()
+
         }
     }
 

@@ -17,7 +17,7 @@ qt_add_qml_module(appGSMKayakpro
     URI GSMKayakpro
     QML_FILES
         Main.qml
-        QML_FILES play.qml
+        QML_FILES Racing.qml
         RESOURCES images/bluetooth.png
         RESOURCES resource.qrc
         SOURCES BluetoothManager.h
