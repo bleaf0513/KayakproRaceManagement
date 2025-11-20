@@ -11,14 +11,11 @@ ApplicationWindow {
     width: Screen.width-15
     height: Screen.height-80
     flags: Qt.Window | Qt.WindowCloseButtonHint
-    // maximumWidth: width
-    // maximumHeight: height
-    // minimumWidth: width
-    // minimumHeight: height
     id:main_window
     title: "Setting..."
     property int _pixelSize:main_window.height/35
     property int _divided_num:6
+
     BluetoothManager {
         id: bluetoothManager
     }
@@ -30,7 +27,7 @@ ApplicationWindow {
     // Root Layout to split into two sections (left and right)
     Component.onCompleted: {
         showMaximized()
-
+        sharedData.readProfile();
         bluetoothManager.startScan();  // Automatically call startScan when the component is fully loaded
     }
     GridLayout {
@@ -42,16 +39,22 @@ ApplicationWindow {
         rowSpacing: 0
         columnSpacing: 0
         width:main_window.width*2/3
-        height:main_window.height*5/5.1
+        height:main_window.height*5/5.35
         // Repeater to create 10 player sections
-
-        Repeater {
+        GridView {
             id:eachplayerinfo
-            model: 10
-            Rectangle {
+            width: parent.width
+            height: parent.height
+            cellWidth: width / 2                  // 2 columns
+            cellHeight: main_window.height / 5.35
+            model: sharedData.players
+            // Repeater {
+            //     id:eachplayerinfo
+            //     model: 10
+            delegate: Rectangle {
                 id:playersettingdlg
                 width: main_window.width/3
-                height: main_window.height/5.1
+                height: main_window.height/5.35
                 color: "transparent"
                 border.color: "blue"
                 border.width: 3
@@ -85,7 +88,7 @@ ApplicationWindow {
                         TextField {
                             id: playerFirstName
                             placeholderText: "FirstName"
-                            text: ""
+                            text: modelData[1]
                             width: playersettingdlg.width/3
                             font.pixelSize: _pixelSize*0.8
                         }
@@ -94,7 +97,7 @@ ApplicationWindow {
                         TextField {
                             id: playerSurName
                             placeholderText: "Surname"
-                            text: ""
+                            text: modelData[2]
                             width: playersettingdlg.width/3
                             font.pixelSize: _pixelSize*0.8
                         }
@@ -106,6 +109,7 @@ ApplicationWindow {
                         TextField {
                             id: playerWeight
                             placeholderText: "Kg"
+                            text:modelData[6]
                             font.pixelSize: _pixelSize*0.8
                             width: playersettingdlg.width/4
                             height:playerFirstName.height
@@ -119,6 +123,12 @@ ApplicationWindow {
                             font.pixelSize: _pixelSize*0.8
                             width: playersettingdlg.width/4
                             model: ["Male", "Female"]
+                            Component.onCompleted: {
+                                const value = modelData[4];
+                                const idx = model.indexOf(value);
+                                if (idx >= 0)
+                                    currentIndex = idx;
+                            }
                         }
                     }
                     RowLayout {
@@ -128,7 +138,7 @@ ApplicationWindow {
                         TextField {
                             id: dob
                             placeholderText: "2000/3/5"
-                            text: ""
+                            text: modelData[7]
                             width: playersettingdlg.width*2.85/3
                             font.pixelSize: _pixelSize*0.8
                         }
@@ -137,7 +147,7 @@ ApplicationWindow {
                         TextField {
                             id: cat
                             placeholderText: "U12"
-                            text: ""
+                            text: modelData[5]
                             width: playersettingdlg.width*2.85/3
                             font.pixelSize: _pixelSize*0.8
                         }
@@ -150,7 +160,7 @@ ApplicationWindow {
                         TextField {
                             id: club
                             placeholderText: "Wey Kayak Club"
-                            text: ""
+                            text: modelData[3]
                             width: 500//playersettingdlg.width*2.85/3
                             font.pixelSize: _pixelSize*0.8
                         }
@@ -160,6 +170,7 @@ ApplicationWindow {
                             id: noindex
                             font.pixelSize: _pixelSize*0.8
                             width: playersettingdlg.width/4
+                            currentIndex: index
                             model: [1,2,3,4,5,6,7,8,9,10]
                         }
 
@@ -167,6 +178,7 @@ ApplicationWindow {
 
 
                 }
+
             }
         }
     }
@@ -225,7 +237,7 @@ ApplicationWindow {
             y:left_field.height/1.4
             onClicked: {
                 for (var i = 0; i < 10; i++) {
-                    var item = eachplayerinfo.itemAt(i);
+                    var item = eachplayerinfo.itemAtIndex(i);
                     if (!item) continue;
                     sharedData.setSharedItem(i,0,item.number);
                     sharedData.setSharedItem(i,1,item.firstName);
@@ -236,6 +248,7 @@ ApplicationWindow {
                     sharedData.setSharedItem(i,6,item.weight);
                     sharedData.setSharedItem(i,7,item.dobValue);
                 }
+                sharedData.writeProfile();
                 //print saveCsvFile
                 main_window.visible=false;
                 loader.source="Racing.qml"
