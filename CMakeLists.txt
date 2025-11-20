@@ -4,7 +4,14 @@ project(GSMKayakpro VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Core Bluetooth)
+find_package(Qt6 REQUIRED COMPONENTS
+    Quick
+    Core
+    Bluetooth
+    Gui
+    Qml
+    PrintSupport
+)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -21,6 +28,8 @@ qt_add_qml_module(appGSMKayakpro
         RESOURCES images/bluetooth.png
         RESOURCES resource.qrc
         SOURCES BluetoothManager.h
+        SOURCES PrintManager.cpp PrintManager.h
+        SOURCES SharedData.cpp SharedData.h
         #SOURCES BluetoothManager.cpp
 )
 
@@ -41,6 +50,10 @@ set_target_properties(appGSMKayakpro PROPERTIES
 target_link_libraries(appGSMKayakpro
     PRIVATE Qt6::Quick
     Qt6::Bluetooth
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::PrintSupport
 )
 # target_link_libraries(appGSMKayakpro
 #     PRIVATE Qt6::Bluetooth

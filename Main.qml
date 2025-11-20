@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Controls 2.5
 import QtQuick.Window 2.15
 import com.kayakpro.bluetooth 1.0
+import com.kayakpro.shareddata 1.0
 ApplicationWindow {
     x:0
     y:0
@@ -17,8 +18,14 @@ ApplicationWindow {
     id:main_window
     title: "Setting..."
     property int _pixelSize:main_window.height/35
+    property int _divided_num:6
     BluetoothManager {
         id: bluetoothManager
+    }
+    SharedData {
+        id:sharedData
+        Component.onCompleted: {
+        }
     }
     // Root Layout to split into two sections (left and right)
     Component.onCompleted: {
@@ -39,9 +46,10 @@ ApplicationWindow {
         // Repeater to create 10 player sections
 
         Repeater {
+            id:eachplayerinfo
             model: 10
             Rectangle {
-                id:player_setting_dlg
+                id:playersettingdlg
                 width: main_window.width/3
                 height: main_window.height/5.1
                 color: "transparent"
@@ -49,8 +57,16 @@ ApplicationWindow {
                 border.width: 3
                 layer.enabled: true
                 layer.smooth: true
+                enabled:true
                 z:20
-
+                property alias firstName: playerFirstName.text
+                property alias surName: playerSurName.text
+                property alias weight: playerWeight.text
+                property alias sex: playerSex.currentText
+                property alias dobValue: dob.text
+                property alias catValue: cat.text
+                property alias clubValue: club.text
+                property alias number: noindex.currentIndex
 
                 Image {
                     width:56
@@ -61,56 +77,92 @@ ApplicationWindow {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins:8
-                    //leftMargin:  player_setting_dlg.width/3
-                    spacing: 6
-
-                    // ------------------
-                    // Player Image & Name
-                    // ------------------
+                    spacing: 8
                     RowLayout {
                         spacing: 8
-                        Item{width:player_setting_dlg.width/4}
-                        Label { text: "Player" + (index + 1)+":"; color: "blue"; font.pixelSize: _pixelSize }
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "First Name:"; color: "blue"; font.pixelSize: _pixelSize*0.8 }
                         TextField {
-                            id: playerName
-                            placeholderText: "Name"
+                            id: playerFirstName
+                            placeholderText: "FirstName"
                             text: ""
-                            width: player_setting_dlg.width/3
-                            font.pixelSize: _pixelSize
+                            width: playersettingdlg.width/3
+                            font.pixelSize: _pixelSize*0.8
+                        }
+
+                        Label { text: "Surname:"; color: "blue"; font.pixelSize: _pixelSize*0.8 }
+                        TextField {
+                            id: playerSurName
+                            placeholderText: "Surname"
+                            text: ""
+                            width: playersettingdlg.width/3
+                            font.pixelSize: _pixelSize*0.8
                         }
                     }
-
-                    // ------------------
-                    // Weight Input
-                    // ------------------
                     RowLayout {
                         spacing: 8
-                        Item{width:player_setting_dlg.width/4}
-                        Label { text: "Weight:"; color: "blue"; font.pixelSize: _pixelSize }
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "Weight:      "; color: "blue"; font.pixelSize: _pixelSize*0.8 }
                         TextField {
                             id: playerWeight
                             placeholderText: "Kg"
-                            font.pixelSize: _pixelSize
-                            width: player_setting_dlg.width/4
-                            height:playerName.height
+                            font.pixelSize: _pixelSize*0.8
+                            width: playersettingdlg.width/4
+                            height:playerFirstName.height
                             inputMethodHints: Qt.ImhDigitsOnly
                             validator: IntValidator { bottom: 30; top: 200 }  // realistic range
                         }
-                    }
-
-                    // ------------------
-                    // Sex Input
-                    // ------------------
-                    RowLayout {
-                        spacing: 8
-                        Item{width:player_setting_dlg.width/4}
-                        Label { text: "Sex:      "; color: "blue"; font.pixelSize: _pixelSize }
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "M/F:"; color: "blue"; font.pixelSize: _pixelSize*0.8 }
                         ComboBox {
                             id: playerSex
-                            font.pixelSize: _pixelSize
-                            width: player_setting_dlg.width/4
-                            model: ["Male", "Female", "Other"]
+                            font.pixelSize: _pixelSize*0.8
+                            width: playersettingdlg.width/4
+                            model: ["Male", "Female"]
                         }
+                    }
+                    RowLayout {
+                        spacing: 8
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "DOB:          "; color: "blue"; font.pixelSize: _pixelSize*0.8 }
+                        TextField {
+                            id: dob
+                            placeholderText: "2000/3/5"
+                            text: ""
+                            width: playersettingdlg.width*2.85/3
+                            font.pixelSize: _pixelSize*0.8
+                        }
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "Cat: "; color: "blue"; font.pixelSize: _pixelSize*0.8 }
+                        TextField {
+                            id: cat
+                            placeholderText: "U12"
+                            text: ""
+                            width: playersettingdlg.width*2.85/3
+                            font.pixelSize: _pixelSize*0.8
+                        }
+
+                    }
+                    RowLayout {
+                        spacing: 8
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "Club:          "; color: "blue"; font.pixelSize: _pixelSize*0.8 }
+                        TextField {
+                            id: club
+                            placeholderText: "Wey Kayak Club"
+                            text: ""
+                            width: 500//playersettingdlg.width*2.85/3
+                            font.pixelSize: _pixelSize*0.8
+                        }
+                        Item{width:playersettingdlg.width/12}
+                        Label { text: "Lane: "; color: "blue"; font.pixelSize: _pixelSize*0.8 }
+                        ComboBox {
+                            id: noindex
+                            font.pixelSize: _pixelSize*0.8
+                            width: playersettingdlg.width/4
+                            model: [1,2,3,4,5,6,7,8,9,10]
+                        }
+
                     }
 
 
@@ -172,8 +224,20 @@ ApplicationWindow {
             x:left_field.width/2.5
             y:left_field.height/1.4
             onClicked: {
-
-               main_window.visible=false;
+                for (var i = 0; i < 10; i++) {
+                    var item = eachplayerinfo.itemAt(i);
+                    if (!item) continue;
+                    sharedData.setSharedItem(i,0,item.number);
+                    sharedData.setSharedItem(i,1,item.firstName);
+                    sharedData.setSharedItem(i,2,item.surName);
+                    sharedData.setSharedItem(i,3,item.clubValue);
+                    sharedData.setSharedItem(i,4,item.sex);
+                    sharedData.setSharedItem(i,5,item.catValue);
+                    sharedData.setSharedItem(i,6,item.weight);
+                    sharedData.setSharedItem(i,7,item.dobValue);
+                }
+                //print saveCsvFile
+                main_window.visible=false;
                 loader.source="Racing.qml"
 
             }

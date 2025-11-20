@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Shapes
 import QtQuick.Window 2.15
+import com.kayakpro.print 1.0
 ApplicationWindow {
 
     id:second_window
@@ -19,6 +20,9 @@ ApplicationWindow {
     property var ranking_number:[1,2,3,4,5,6,7,8,9,10]
     property var player_name:["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","engineer"]
     property int countdown: 10  // Start counting from 10
+    PrintManager{
+        id:printManager
+    }
     Component.onCompleted: {
         showMaximized()
 
@@ -149,7 +153,8 @@ ApplicationWindow {
         x:second_window.width*0.7
         y:second_window.height-height_spacing*0.8
         onClicked: {
-
+            printManager.saveCsv();
+            printManager.printCsv("race_record.csv");
         }
     }
     Button {
@@ -158,7 +163,7 @@ ApplicationWindow {
         font.pixelSize: _pixelSize
         x:print_but.x+print_but.width*2
         y:second_window.height-height_spacing*0.8
-        width:ready_but.width
+        width:print_but.width
 
         onClicked: {
             Qt.quit()
