@@ -3,8 +3,9 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QTimer>
 const QBluetoothUuid FTMS_SERVICE_UUID("00001826-0000-1000-8000-00805f9b34fb");
-const QBluetoothUuid ROWER_DATA_CHAR_UUID("00002AD3-0000-1000-8000-00805f9b34fb");
+const QBluetoothUuid ROWER_DATA_CHAR_UUID("00002AD1-0000-1000-8000-00805f9b34fb");
 const QBluetoothUuid RESISTANCE_LEVEL_CHAR_UUID("00002AD6-0000-1000-8000-00805f9b34fb");
 static void logWarningToFile(const QString &message)
 {
@@ -36,17 +37,13 @@ void BluetoothManager::startScan()
 
 void BluetoothManager::deviceDiscovered(const QBluetoothDeviceInfo &device)
 {
-    qWarning()<<device.name();
-
-    if (device.name() == "KP3902" ) {
-        if (consoles.size() >= 10)
-            return;
-
+    if (device.name() == "KP3902") {
         KayakConsole console;
         console.name = device.name();
         console.address = device.address().toString();
+        console.deviceInfo = device;     // IMPORTANT!!!
         consoles.append(console);
-        qDebug() << "Added KP3902 console:" << console.address;
+        qDebug() << "Found:" << console.name << console.address;
     }
 }
 
@@ -56,97 +53,110 @@ void BluetoothManager::scanFinished()
     for (int i = 0; i < consoles.size(); ++i)
         connectConsole(&consoles[i]);
 }
+void BluetoothManager::setupFtmsService(KayakConsole *console)
+{
+    qWarning() << console->name << "FTMS details discovered.";
+
+    console->metricsChar =
+        console->ftmsService->characteristic(ROWER_DATA_CHAR_UUID);
+
+    console->resistanceLevelChar =
+        console->ftmsService->characteristic(RESISTANCE_LEVEL_CHAR_UUID);
+
+    if (!console->metricsChar.isValid()) {
+        qWarning() << "Metrics characteristic not found!";
+        return;
+    }
+
+    // Enable notifications
+    QLowEnergyDescriptor cccd =
+        console->metricsChar.descriptor(
+            QBluetoothUuid("00002902-0000-1000-8000-00805f9b34fb"));
+
+    if (cccd.isValid()) {
+        console->ftmsService->writeDescriptor(cccd, QByteArray::fromHex("0100"));
+        qWarning() << "Notifications enabled.";
+    } else {
+        qWarning() << "CCCD (2902) not found!";
+    }
+
+    connect(console->ftmsService, &QLowEnergyService::characteristicChanged,
+            this, &BluetoothManager::characteristicChanged);
+}
 
 void BluetoothManager::connectConsole(KayakConsole *console)
 {
-    logWarningToFile("temp1");
-    QBluetoothAddress addr(console->address);
-    console->controller = QLowEnergyController::createCentral(QBluetoothDeviceInfo(addr,console->name,1), this);
-
+    console->controller = QLowEnergyController::createCentral(console->deviceInfo, nullptr);
+    console->controller->moveToThread(this->thread()); // Thread-safe
+    qWarning()<<"Next Step";
     connect(console->controller, &QLowEnergyController::connected, [console]() {
-        qDebug() << console->name << "connected. Discovering services...";
-        console->controller->discoverServices();
+        qDebug() << console->name << "connected. Discovering services in 150ms...";
+        QTimer::singleShot(150, [console]() { console->controller->discoverServices(); });
     });
 
-    connect(console->controller, &QLowEnergyController::disconnected, [console]() {
-        qDebug() << console->name << "disconnected.";
-    });
-    logWarningToFile("temp2");
-    connect(console->controller, &QLowEnergyController::serviceDiscovered,
+    connect(console->controller, &QLowEnergyController::serviceDiscovered, this,
             [this, console](const QBluetoothUuid &uuid) {
-                if (uuid == FTMS_SERVICE_UUID) {
-                    console->ftmsService = console->controller->createServiceObject(uuid, this);
-                    if (!console->ftmsService)
-                        return;
-                    logWarningToFile(uuid.toString());
-                    connect(console->ftmsService, &QLowEnergyService::stateChanged,
-                            [this, console](QLowEnergyService::ServiceState s) {
-                        logWarningToFile("temp4.1");
-                              //  if (s == QLowEnergyService::ServiceDiscovered) {
-                                    // Assign characteristics
-                                    console->metricsChar = console->ftmsService->characteristic(ROWER_DATA_CHAR_UUID);
-                                    console->resistanceLevelChar = console->ftmsService->characteristic(RESISTANCE_LEVEL_CHAR_UUID);
-
-                                    if (!console->resistanceLevelChar.isValid()) {
-                                        qDebug() << "Resistance characteristic not found! Listing all characteristics:";
-                                        for (const QLowEnergyCharacteristic &c : console->ftmsService->characteristics())
-                                            qDebug() << c.uuid().toString();
-                                    }
-                                    logWarningToFile("temp4.2");
-                                    // Enable notifications for metrics
-                                    if (console->metricsChar.isValid()) {
-                                        QLowEnergyDescriptor desc = console->metricsChar.descriptor(
-                                            QBluetoothUuid(QLatin1String("00001826-0000-1000-8000-00805f9b34fb")));
-                                        if (desc.isValid())
-                                        {    console->ftmsService->writeDescriptor(desc, QByteArray::fromHex("0100"));
-                                            logWarningToFile("temp4.3");
-                                        }
-                                    }
-
-                                    connect(console->ftmsService, &QLowEnergyService::characteristicChanged,
-                                            this, &BluetoothManager::characteristicChanged);
-
-                                    qDebug() << console->name << "service setup complete.";
-
-                             //   }
-                              //  else
-                             //   {
-                              //      logWarningToFile("temp4.3");
-                             //   }
-                            });
-
-                    console->ftmsService->discoverDetails();
+                if (uuid != FTMS_SERVICE_UUID) return;
+                console->ftmsService = console->controller->createServiceObject(FTMS_SERVICE_UUID, nullptr);
+                if (!console->ftmsService) {
+                    qWarning() << console->name << "Unable to create FTMS service!";
+                    return;
                 }
+
+                console->ftmsService->moveToThread(this->thread());
+
+                connect(console->ftmsService, &QLowEnergyService::stateChanged, this,
+                        [this, console](QLowEnergyService::ServiceState s) {
+                            if (s == QLowEnergyService::ServiceDiscovered) {
+                                setupFtmsService(console);
+                                qDebug() << console->name << "FTMS service ready.";
+                            }
+                        });
+
+                QTimer::singleShot(50, [console]() { console->ftmsService->discoverDetails(); });
             });
+
+    connect(console->controller, &QLowEnergyController::errorOccurred, [](QLowEnergyController::Error e){
+        qWarning() << "Controller error:" << e;
+    });
 
     console->controller->connectToDevice();
 }
-
+quint16 readUInt16(const quint8* data, int lowIndex)
+{
+    return static_cast<quint16>(data[lowIndex]) | (static_cast<quint16>(data[lowIndex + 1]) << 8);
+}
 void BluetoothManager::characteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    logWarningToFile("temp5");
-    for (auto &console : consoles) {
-        // if (c.uuid() == console.metricsChar.uuid() && value.size() >= 18) {
-        const quint8 *data = reinterpret_cast<const quint8*>(value.constData());
 
-        console.strokeRate    = data[3] | (data[4] << 8);
-        console.strokeCount   = data[13] | (data[14] << 8);
-        console.avgStrokeRate = data[15] | (data[16] << 8);
-        console.totalDistance = (data[5] | (data[6] << 8)) / 10.0;
-        console.instantPace   = (data[1] | (data[2] << 8)) / 100.0;
-        console.elapsedTime   = data[9] | (data[10] << 8);
-        console.remainingTime = data[11] | (data[12] << 8);
-        console.energyPerHour = data[17] | (data[18] << 8);
-        console.power         = data[7] | (data[8] << 8);
+    // Find console whose metricsChar matches
+    KayakConsole *console = nullptr;
+    for (auto &csl : consoles) {
+        if (csl.metricsChar.isValid() && csl.metricsChar == c) {
+            console = &csl;
+            break;
+        }
+    }
+    if (!console) {
+        qWarning() << "Unknown console characteristic changed!";
+        return;
+    }
 
-        QString temp="StrokeRate:"+QString::number(console.strokeRate)+"\n";
-        temp+="StrokeCount:"+QString::number(console.strokeCount)+"\n";
-        temp+="AvgStrokeRate:"+QString::number(console.avgStrokeRate)+"\n";
-        temp+="Distance:"+QString::number(console.totalDistance)+"\n";
-        temp+="Elapsed:"+QString::number(console.elapsedTime)+"\n";
-        temp+="Power:"+QString::number(console.power)+"\n";
-        logWarningToFile(temp);
-        //        }
+    // Append new bytes to buffer
+    console->buffer.append(value);
+
+    // Parse full 20-byte packets from buffer
+    while (console->buffer.size() >= 20) {
+        qWarning()<<value;
+        QByteArray packet = console->buffer.left(20);
+        console->buffer.remove(0, 20); // remove parsed bytes
+
+        if (console->updateMetrics(packet)) {
+            qDebug() << "Console:" << console->name
+                               << "\n" << console->getMetrics();
+        } else {
+            qWarning() << "Failed to parse KP3902 packet from" << console->name;
+        }
     }
 }
 
@@ -174,16 +184,21 @@ QVariantMap BluetoothManager::getMetrics(int consoleIndex)
     if (consoleIndex < 0 || consoleIndex >= consoles.size())
         return map;
 
-    auto &c = consoles[consoleIndex];
-    map["strokeRate"] = c.strokeRate;
-    map["strokeCount"] = c.strokeCount;
-    map["avgStrokeRate"] = c.avgStrokeRate;
-    map["distance"] = c.totalDistance;
-    map["instantPace"] = c.instantPace;
-    map["elapsedTime"] = c.elapsedTime;
-    map["remainingTime"] = c.remainingTime;
-    map["energyPerHour"] = c.energyPerHour;
-    map["power"] = c.power;
+    const auto &c = consoles[consoleIndex];
+
+    map["strokeRate"]      = c.strokeRate;        // strokes/min
+    map["strokeCount"]     = c.strokeCount;       // total strokes
+    // map["avgStrokeRate"]   = c.avgStrokeRate;     // average strokes/min
+    // map["totalDistance"]   = c.totalDistance;     // meters
+    // map["instantPace"]     = c.instantPace;       // m/s
+    // map["avgPace"]         = c.avgPace;           // m/s
+    // map["power"]           = c.power;             // watts
+    // map["avgPower"]        = c.avgPower;          // watts
+    // map["resistanceLevel"] = c.resistanceLevel;   // 0-?? scale
+    // map["elapsedTime"]     = c.elapsedTime;       // seconds
+    // map["remainingTime"]   = c.remainingTime;     // seconds
+    // map["heartRate"]       = c.heartRate;         // bpm
+    // //map["expendedEnergy"]  = c.expendedEnergy;    // kcal or joules (check device)
 
     return map;
 }

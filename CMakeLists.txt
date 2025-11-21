@@ -11,6 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS
     Gui
     Qml
     PrintSupport
+    QuickControls2
 )
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -30,6 +31,7 @@ qt_add_qml_module(appGSMKayakpro
         SOURCES BluetoothManager.h
         SOURCES PrintManager.cpp PrintManager.h
         SOURCES SharedData.cpp SharedData.h
+        QML_FILES SetBluetoothAddress.qml
         #SOURCES BluetoothManager.cpp
 )
 
@@ -54,6 +56,7 @@ target_link_libraries(appGSMKayakpro
     Qt6::Gui
     Qt6::Qml
     Qt6::PrintSupport
+    Qt6::QuickControls2
 )
 # target_link_libraries(appGSMKayakpro
 #     PRIVATE Qt6::Bluetooth
