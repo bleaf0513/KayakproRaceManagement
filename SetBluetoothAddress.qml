@@ -21,6 +21,8 @@ ApplicationWindow {
     readonly property color textSecondary: "#BBBBBB"
     readonly property color accentGreen: "#18C77A"
     readonly property color accentHover: "#16B370"
+    readonly property color accentNext: "#3388FF"
+    readonly property color accentNextHover: "#2277DD"
     readonly property color fieldFocus: "#2D8CFF"
 
     Rectangle {
@@ -78,7 +80,7 @@ ApplicationWindow {
                                 padding: 10
                                 background: Rectangle {
                                     radius: 12
-                                    border.color:fieldFocus// control.activeFocus ? fieldFocus : cardBorder
+                                    border.color: fieldFocus
                                     border.width: 1
                                     color: "#2A2A3B"
                                 }
@@ -90,35 +92,72 @@ ApplicationWindow {
             }
         }
 
-        // Global Save All Button
+        // Buttons Row
     }
-    Rectangle {
-        //Layout.fillWidth: true
-        width:root.width/10
-        height: root.height/25
-        x:root.width/2-width/2
-        y:root.height*0.82
-        radius: 14
-        color: accentGreen
+    RowLayout {
+        spacing: 20
+        //  Layout.alignment: Qt.AlignHCenter
+        // Layout.fillWidth: true
+        y:parent.height*0.8
+        x:parent.width*0.5
+        // Save Button
+        Rectangle {
+            Layout.preferredWidth: root.width / 10
+            Layout.preferredHeight: root.height / 25
+            radius: 14
+            color: accentGreen
 
-        Text {
-            anchors.centerIn: parent
-            text: "Save"
-            font.pixelSize: 20
-            font.bold: true
-            color: "#FFFFFF"
+            Text {
+                anchors.centerIn: parent
+                text: "Save"
+                font.pixelSize: 20
+                font.bold: true
+                color: "#FFFFFF"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                hoverEnabled: true
+                onEntered: parent.color = accentHover
+                onExited: parent.color = accentGreen
+                onClicked: saveAllMacAddresses()
+            }
         }
 
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            hoverEnabled: true
-            onEntered: parent.color = accentHover
-            onExited: parent.color = accentGreen
-            onClicked: saveAllMacAddresses()
+        // Next Button
+        Rectangle {
+            Layout.preferredWidth: root.width / 10
+            Layout.preferredHeight: root.height / 25
+            radius: 14
+            color: accentNext
+
+            Text {
+                anchors.centerIn: parent
+                text: "Next"
+                font.pixelSize: 20
+                font.bold: true
+                color: "#FFFFFF"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                hoverEnabled: true
+                onEntered: parent.color = accentNextHover
+                onExited: parent.color = accentNext
+                onClicked:{
+                    // Hide current window
+                    root.visible = false
+                    // Load Main.qml
+                    mainLoader.source = "qrc:/qt/qml/GSMKayakpro/Main.qml"
+                }
+            }
         }
     }
-
+    Loader{
+        id:mainLoader
+    }
     // Signal to C++ for saving all MAC addresses
     signal saveAllMacAddresses()
 }

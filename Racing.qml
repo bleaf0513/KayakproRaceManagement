@@ -1,174 +1,164 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
-import QtQuick.Shapes
 import QtQuick.Window 2.15
 import com.kayakpro.print 1.0
+
 ApplicationWindow {
-
-    id:second_window
-    x:0
-    y:0
-    width: Screen.width-15
-    height: Screen.height-80
-    property int _pixelSize:main_window.height/35
-    flags: Qt.Window | Qt.WindowCloseButtonHint
+    id: second_window
+    width: Screen.width * 0.95
+    height: Screen.height * 0.95
+    visible: true
     title: "Racing UI"
-    property int first_tab_width:width/16
-    property int second_tab_width:width/16
-    property int height_spacing:height/11
-    property var ranking_number:[1,2,3,4,5,6,7,8,9,10]
-    property var player_name:["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","engineer"]
-    property int countdown: 10  // Start counting from 10
-    PrintManager{
-        id:printManager
-    }
-    Component.onCompleted: {
-        showMaximized()
 
+    property int _rows: 10
+    property var player_name: ["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","Engineer"]
+    property var ranking_number: [1,2,3,4,5,6,7,8,9,10]
+    property int countdown: 10
+    property real fieldHeight: height / (_rows + 3)
+    property real tabWidth: width / 12
+    property real fontSizeCountdown: width / 3
+
+    PrintManager { id: printManager }
+
+    Component.onCompleted: showMaximized()
+
+    // ------------------------------
+    // Background
+    // ------------------------------
+    Rectangle {
+        anchors.fill: parent
+        color: "#121212"
     }
+
+    // ------------------------------
+    // Countdown (centered)
+    // ------------------------------
     Text {
-        id:time_counter
-        z:10
-
+        id: countdownText
         anchors.centerIn: parent
-        text: countdown===0?"GO!":countdown.toString()  // Display the countdown value
-        font.pixelSize: parent.width/2.5
+        text: countdown === 0 ? "GO!" : countdown.toString()
+        font.pixelSize: fontSizeCountdown
+        font.bold: true
+        color: "#FFD700"
+        z: 100
+
+        // Smooth pulsing animation
+        Behavior on font.pixelSize {
+            NumberAnimation {
+                duration: 1000                  // faster pulse
+                from: fontSizeCountdown * 0.6  // start slightly smaller
+                to: fontSizeCountdown * 1.2    // grow slightly bigger
+                loops: Animation.Infinite
+                easing.type: Easing.InOutSine  // smooth in and out
+            }
+        }
     }
 
     Timer {
         id: countdownTimer
-        interval: 1000  // 1 second interval
-        running: true
+        interval: 1000
         repeat: true
-
+        running: true
         onTriggered: {
-            if (countdown > 0) {
-                countdown -= 1;  // Decrease the countdown by 1 each time
-            } else {
-                countdownTimer.stop();  // Stop the timer when it reaches 0
-                time_counter.visible =false;
+            if (countdown > 0) countdown--
+            else {
+                countdownTimer.stop()
+                countdownText.visible = false
             }
         }
     }
-
-    Shape {
-        width:second_window.width
-        height: second_window.height/11
-
-        ShapePath {
-            strokeWidth: 4
-            strokeColor: "red"
-            strokeStyle: ShapePath.DashLine
-            dashPattern: [ 1, 4 ]
-            startX: 0; startY: 0
-            PathLine { x: second_window.x+second_window.width; y: 4 }
-
-        }
-    }
+    // ------------------------------
+    // Racing Fields
+    // ------------------------------
     Column {
+        id: racingFields
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.left: parent.left
+        anchors.right: parent.right
+        spacing: 4
+        z: 1 // behind countdown
+
         Repeater {
-            model: 10
+            model: _rows
+            Rectangle {
+                width: parent.width
+                height: fieldHeight
+                radius: 12
+                color: index % 2 === 0 ? "#1E1E2A" : "#252535"
 
-            Shape {
-                width:second_window.width
-                height: second_window.height/11
+                Row {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    spacing: 8
 
-                ShapePath {
-                    strokeWidth: 4
-                    strokeColor: "red"
-                    strokeStyle: ShapePath.DashLine
-                    dashPattern: [ 1, 4 ]
-                    startX: 0; startY: second_window.height/11
-                    PathLine { x: second_window.x+second_window.width; y: second_window.height/11+4 }
-
-                }
-                Shape{
-                    x:0
-                    width:first_tab_width
-                    height:second_window.height/11
-                    Text {
-                        anchors.centerIn: parent
-                        font.bold: true
-                        font.pixelSize: _pixelSize
-                        text: {
-
-                            return player_name[index].toString()
+                    // Player Name
+                    Rectangle {
+                        width: tabWidth * 2
+                        height: parent.height
+                        radius: 8
+                        color: "#333344"
+                        Text {
+                            anchors.centerIn: parent
+                            text: player_name[index]
+                            font.pixelSize: fieldHeight * 0.4
+                            color: "#FFFFFF"
+                            font.bold: true
                         }
                     }
-                }
-                Shape{
-                    x:second_window.width-second_tab_width
-                    width:second_tab_width
-                    height:second_window.height/11
-                    Text {
-                        anchors.centerIn: parent
-                        font.bold: true
-                        font.pixelSize: _pixelSize
-                        text: {
 
-                            return ranking_number[index].toString()
+                    // Spacer
+                    Item { width: parent.width - (tabWidth*3 + 16) }
+
+                    // Ranking
+                    Rectangle {
+                        width: tabWidth
+                        height: parent.height
+                        radius: 8
+                        color: "#333344"
+                        Text {
+                            anchors.centerIn: parent
+                            text: ranking_number[index]
+                            font.pixelSize: fieldHeight * 0.4
+                            color: "#FFD700"
+                            font.bold: true
                         }
                     }
                 }
             }
-
         }
     }
 
-    Shape {
-        x:parent.x+first_tab_width-4
-        y:0
-        width: 4
-        height: parent.height
-        ShapePath {
-            strokeWidth: 4
-            strokeColor: "red"
-            strokeStyle: ShapePath.DashLine
-            dashPattern: [ 1, 4 ]
-            startX: parent.x; startY: 0
-            PathLine { x: parent.x; y: second_window.height-height_spacing }
+    // ------------------------------
+    // Buttons
+    // ------------------------------
+    Row {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: 20
+        spacing: 20
 
+        Button {
+            text: "Print"
+            font.pixelSize: fieldHeight * 0.35
+            background: Rectangle {
+                radius: 12
+                color: "#18C77A"
+            }
+            onClicked: {
+                printManager.saveCsv()
+                printManager.printCsv("race_record.csv")
+            }
         }
 
-    }
-    Shape {
-        x:parent.x+parent.width-second_tab_width-4
-        y:0
-        width: 4
-        height: parent.height
-        ShapePath {
-            strokeWidth: 4
-            strokeColor: "red"
-            strokeStyle: ShapePath.DashLine
-            dashPattern: [ 1, 4 ]
-            startX: parent.x; startY: 0
-            PathLine { x: parent.x; y: second_window.height-height_spacing }
+        Button {
+            text: "Exit"
+            font.pixelSize: fieldHeight * 0.35
+            background: Rectangle {
+                radius: 12
+                color: "#E14B4B"
+            }
+            onClicked: Qt.quit()
         }
     }
-    Button {
-        id:print_but
-        text: "Print"
-        font.pixelSize: _pixelSize
-        x:second_window.width*0.7
-        y:second_window.height-height_spacing*0.8
-        onClicked: {
-            printManager.saveCsv();
-            printManager.printCsv("race_record.csv");
-        }
-    }
-    Button {
-        id:exit_but
-        text: "Exit"
-        font.pixelSize: _pixelSize
-        x:print_but.x+print_but.width*2
-        y:second_window.height-height_spacing*0.8
-        width:print_but.width
-
-        onClicked: {
-            Qt.quit()
-
-        }
-    }
-
 }
