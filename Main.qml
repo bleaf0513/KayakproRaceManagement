@@ -167,7 +167,8 @@ Page {
 
             SharedData.setTotalDist(totaldist);
             SharedData.writeProfile();
-            if (stack) {
+            if(_activeconsoles<2) return
+            if (stack  ) {
                 var comp = Qt.createComponent("Racing.qml");
                 if (comp.status === Component.Ready) {
                     var page = comp.createObject(stack, {

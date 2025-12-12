@@ -2,6 +2,7 @@
 #include "BluetoothManager.h"
 int global_playernum=0;
 int global_totaldist=0;
+int global_setting_page_click=0;
 QList<QStringList> global_data;
 extern QList<KayakConsole> consoles;
 SharedData::SharedData(QObject *parent) : QObject(parent) {
@@ -148,4 +149,12 @@ QString SharedData::playerCat(int consoleIndex)  {
     if (consoleIndex < 0 || consoleIndex >= 10)
         return "";
     return global_data[consoleIndex+1].at(CAT);
+}
+void SharedData::setConfirmSetting(int flag)
+{
+    global_setting_page_click=flag;
+}
+int SharedData::isConfirmSetting()
+{
+    return global_setting_page_click;
 }

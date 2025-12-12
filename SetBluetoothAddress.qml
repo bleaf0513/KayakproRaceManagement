@@ -8,9 +8,9 @@ Page  {
     id: root
     width: 1920//Screen.width - 20
     height: 1080//Screen.height - 50
-  //  visible: true
-   // title: "KP3902 MAC Address Settings"
-  //      flags: Qt.FramelessWindowHint
+    //  visible: true
+    // title: "KP3902 MAC Address Settings"
+    //      flags: Qt.FramelessWindowHint
     property StackView stack
     property int consoleCount: 10
     property var blueNames: Array(consoleCount).fill("")
@@ -26,6 +26,9 @@ Page  {
     readonly property color accentNext: "#3388FF"
     readonly property color accentNextHover: "#2277DD"
     readonly property color fieldFocus: "#2D8CFF"
+
+
+
     Image {
         //anchors.fill: parent
         width:1920
@@ -33,11 +36,11 @@ Page  {
 
         source:"images/device_connect.png"
     }
-//    onClosing:
-//    {
-//        console.log("ComponentDestruction:")
-//        Qt.quit()
-//    }
+    //    onClosing:
+    //    {
+    //        console.log("ComponentDestruction:")
+    //        Qt.quit()
+    //    }
     BluetoothManager {
         Component.onCompleted: {
 
@@ -45,6 +48,7 @@ Page  {
     }
 
     Component.onCompleted:{
+
         for(var i=0;i<consoleCount;i++)
         {
 
@@ -73,7 +77,7 @@ Page  {
                 width:454.92
                 height:50.04
                 Layout.fillWidth: true
-                placeholderText: "XX:XX:XX:XX:XX:XX"
+                placeholderText: "Console Name or Mac"
                 text: SharedData.blueMacAddress(index)
 
                 color: "#22C55E"
@@ -155,6 +159,7 @@ Page  {
 
                         SharedData.setBlueMacAddress(i,blueNames[i],macAddresses[i]);
                     }
+                    SharedData.setConfirmSetting(1);
                     stack.pop();
                 }
             }

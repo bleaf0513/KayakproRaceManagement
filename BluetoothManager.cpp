@@ -81,34 +81,6 @@ void BluetoothManager::startScan()
     static bool done = false;
     if (done) return;
     done = true;
-/*
-            KayakConsole console;
-consoles.clear();
-           // qWarning()<<"DONG_DEVINFO"<<console.deviceInfo.deviceUuid()<<console.deviceInfo.serviceUuids().at(0);
-            int index=0;
-            //for(int i=1;i<=10;i++)
-            int i=1;
-            {
-               // qDebug() << "global_data:" <<i<<":"<< global_data[i].at(8);
-                if(global_data[i].at(8)!="" && global_data[i].at(10)!="")
-                {
-                    QBluetoothAddress add(global_data[i].at(8));
-                    QBluetoothDeviceInfo devinfo(add,global_data[i].at(10),0);
-
-                    console.id=i-1;
-                    console.name = global_data[i].at(10);
-                    console.address = global_data[i].at(8);
-                    console.deviceInfo = devinfo;     // IMPORTANT!!!
-                    consoles.append(console);
-                    qDebug() << "Found:" << global_data[i].at(10) << global_data[i].at(8);
-                    connectConsole(&consoles[index]);
-   // QTimer::singleShot(index*450, [this,index]() { connectConsole(&consoles[index]); });
-    index++;
-                }
-            }
-
-
-    */
     for(int i=0;i<10;i++)
     {
         if(global_data[i+1].at(8)=="")
@@ -143,7 +115,7 @@ qWarning()<<"DONG_DEVINFO"<<device.address().toString()<<"   "<<device.name();
             for(int i=1;i<=10;i++)
             {
                // qDebug() << "global_data:" <<i<<":"<< global_data[i].at(8);
-                if(global_data[i].at(8)==console.address)
+                if(global_data[i].at(8)==console.address || global_data[i].at(8)==console.name)
                 {
 
                     console.id=i-1;

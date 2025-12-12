@@ -7,6 +7,7 @@
 extern QList<QStringList> global_data;
 extern int global_playernum;
 extern int global_totaldist;
+extern int global_setting_page_click;
 enum PLAER_PROPERTY_INDEX{
     LANE,
     FIRSTNAME,
@@ -61,6 +62,8 @@ public:
     Q_INVOKABLE QString blueMacAddress(int consoleIndex);
     Q_INVOKABLE QString blueNames(int consoleIndex);
     Q_INVOKABLE int getPlayerNum(){return global_playernum;}
+    Q_INVOKABLE void setConfirmSetting(int);
+    Q_INVOKABLE int isConfirmSetting();
     // Return players for QML model
     QVariantList players() const;
 
