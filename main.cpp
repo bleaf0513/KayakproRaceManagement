@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     QObject *rootObject = engine.rootObjects().first();
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(rootObject);
+    window->setIcon(QIcon("app_icon.ico"));
     if (window) {
         window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         window->showFullScreen();
