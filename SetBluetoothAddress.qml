@@ -2,17 +2,19 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Window
-
-ApplicationWindow {
+import shareddataApp 1.0
+import com.kayakpro.bluetooth 1.0
+Page  {
     id: root
-    width: Screen.width - 20
-    height: Screen.height - 50
-    visible: true
-    title: "KP3902 MAC Address Settings"
-
+    width: 1920//Screen.width - 20
+    height: 1080//Screen.height - 50
+  //  visible: true
+   // title: "KP3902 MAC Address Settings"
+  //      flags: Qt.FramelessWindowHint
+    property StackView stack
     property int consoleCount: 10
+    property var blueNames: Array(consoleCount).fill("")
     property var macAddresses: Array(consoleCount).fill("")
-
     // Colors
     readonly property color bgColor: "#121212"
     readonly property color cardColor: "#1E1E2A"
@@ -24,92 +26,94 @@ ApplicationWindow {
     readonly property color accentNext: "#3388FF"
     readonly property color accentNextHover: "#2277DD"
     readonly property color fieldFocus: "#2D8CFF"
+    Image {
+        //anchors.fill: parent
+        width:1920
+        height:1080
 
-    Rectangle {
-        anchors.fill: parent
-        color: bgColor
+        source:"qrc:/images/device_connect.png"
     }
+//    onClosing:
+//    {
+//        console.log("ComponentDestruction:")
+//        Qt.quit()
+//    }
+    BluetoothManager {
+        Component.onCompleted: {
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 20
-        spacing: 20
-
-        ScrollView {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Flow {
-                id: flowGrid
-                width: parent.width
-                spacing: 20
-                flow: Flow.LeftToRight
-
-                Repeater {
-                    model: consoleCount
-
-                    Rectangle {
-                        width: (flowGrid.width - flowGrid.spacing) / 2
-                        height: content.implicitHeight + 40
-                        radius: 20
-                        color: cardColor
-                        border.color: cardBorder
-                        border.width: 1
-
-                        property int consoleId: index + 1
-
-                        ColumnLayout {
-                            id: content
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 14
-
-                            Text {
-                                text: "Console " + (index + 1)
-                                font.pixelSize: 24
-                                font.bold: true
-                                color: textPrimary
-                            }
-
-                            TextField {
-                                Layout.fillWidth: true
-                                placeholderText: "XX:XX:XX:XX:XX:XX"
-                                text: macAddresses[index]
-                                font.pixelSize: 18
-                                color: textPrimary
-                                padding: 10
-                                background: Rectangle {
-                                    radius: 12
-                                    border.color: fieldFocus
-                                    border.width: 1
-                                    color: "#2A2A3B"
-                                }
-                                onTextChanged: macAddresses[index] = text
-                            }
-                        }
-                    }
-                }
-            }
         }
-
-        // Buttons Row
     }
+
+    Component.onCompleted:{
+        for(var i=0;i<consoleCount;i++)
+        {
+
+            blueNames[i]=SharedData.blueNames(i);
+            macAddresses[i]=SharedData.blueMacAddress(i);
+        }
+        showMaximized()
+    }
+    // Rectangle {
+    //     anchors.fill: parent
+    //     color: bgColor
+    // }
+    GridLayout {
+        id: grid
+        x:173.73
+        y:262.67
+        width:1137.29
+        height:568.64
+        columns: 2
+        rows:5
+        rowSpacing:79.61
+        columnSpacing:227.45
+        Repeater{
+            model:10
+            TextField {
+                width:454.92
+                height:50.04
+                Layout.fillWidth: true
+                placeholderText: "XX:XX:XX:XX:XX:XX"
+                text: SharedData.blueMacAddress(index)
+
+                color: "#22C55E"
+                font.pixelSize:16
+                font.weight: 400
+                //font.bold: true
+                font.family: "Inter"
+                padding: 10
+                palette {
+                    placeholderText: "#4B5563"
+                }
+                background: Rectangle {
+                    radius: 10
+
+                    border.color: "#1E3A5F"
+                    border.width: 1
+                    color: "#041316"
+                }
+                onTextChanged: macAddresses[index] = text
+            }
+
+
+        }
+    }
+
     RowLayout {
         spacing: 20
         //  Layout.alignment: Qt.AlignHCenter
         // Layout.fillWidth: true
-        y:parent.height*0.8
-        x:parent.width*0.5
-        // Save Button
+        y:700//1016//parent.height*0.8
+        x:1648//parent.width*0.5
         Rectangle {
-            Layout.preferredWidth: root.width / 10
-            Layout.preferredHeight: root.height / 25
+            Layout.preferredWidth: 110//root.width / 10
+            Layout.preferredHeight: 44//root.height / 25
             radius: 14
             color: accentGreen
 
             Text {
                 anchors.centerIn: parent
-                text: "Save"
+                text: "Exit"
                 font.pixelSize: 20
                 font.bold: true
                 color: "#FFFFFF"
@@ -121,20 +125,19 @@ ApplicationWindow {
                 hoverEnabled: true
                 onEntered: parent.color = accentHover
                 onExited: parent.color = accentGreen
-                onClicked: saveAllMacAddresses()
+                onClicked: Qt.quit()//saveAllMacAddresses()
             }
         }
-
         // Next Button
         Rectangle {
-            Layout.preferredWidth: root.width / 10
-            Layout.preferredHeight: root.height / 25
+            Layout.preferredWidth: 110//root.width / 10
+            Layout.preferredHeight: 44//root.height / 25
             radius: 14
             color: accentNext
 
             Text {
                 anchors.centerIn: parent
-                text: "Next"
+                text: "Confirm"
                 font.pixelSize: 20
                 font.bold: true
                 color: "#FFFFFF"
@@ -147,13 +150,19 @@ ApplicationWindow {
                 onEntered: parent.color = accentNextHover
                 onExited: parent.color = accentNext
                 onClicked:{
-                    // Hide current window
-                    root.visible = false
-                    // Load Main.qml
-                    mainLoader.source = "qrc:/qt/qml/GSMKayakpro/Main.qml"
+                    for(var i=0;i<consoleCount;i++)
+                    {
+
+                        SharedData.setBlueMacAddress(i,blueNames[i],macAddresses[i]);
+                    }
+                    stack.pop();
                 }
             }
         }
+        // Save Button
+
+
+
     }
     Loader{
         id:mainLoader

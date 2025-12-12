@@ -25,13 +25,34 @@ qt_add_qml_module(appGSMKayakpro
     URI GSMKayakpro
     QML_FILES
         Main.qml
-        QML_FILES Racing.qml
-        RESOURCES images/bluetooth.png
-        RESOURCES resource.qrc
+        QML_FILES
         SOURCES BluetoothManager.h
         SOURCES PrintManager.cpp PrintManager.h
         SOURCES SharedData.cpp SharedData.h
         QML_FILES SetBluetoothAddress.qml
+        QML_FILES Racing.qml
+        RESOURCES images/bluetooth.png
+        RESOURCES images/race_background.png
+        RESOURCES images/race_result.png
+        RESOURCES images/race_line.png
+        RESOURCES images/race_vector_line.svg
+        RESOURCES images/race_vector_passed.svg
+        RESOURCES images/player_sprite.png
+        RESOURCES images/player_sprite.png
+        RESOURCES images/each_lane_rect.svg
+        RESOURCES images/race_label.svg
+        RESOURCES images/bluetooth.png images/each_lane_rect.svg  images/kayak.gif  images/player_sprite.png images/race_background.png images/race_label.svg images/race_line.png images/race_result.png images/race_vector_line.svg images/race_vector_passed.svg
+        RESOURCES images/main_background.svg
+        RESOURCES images/check_icon.svg
+        RESOURCES images/CONNECTED.svg
+        RESOURCES images/CONNECTING.svg images/FAILED.svg
+        RESOURCES images/main_number.svg
+        RESOURCES images/end_line.svg
+        RESOURCES  images/icon.png
+        RESOURCES  images/icon.png
+        RESOURCES images/device_connect.png
+        RESOURCES images/spin.svg
+        QML_FILES App.qml FirstScreen.qml Main.qml Racing.qml
         #SOURCES BluetoothManager.cpp
 )
 

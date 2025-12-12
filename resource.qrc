@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/images">
-        <file alias="bluetooth.png">images/bluetooth.png</file>
-    </qresource>
-</RCC>
