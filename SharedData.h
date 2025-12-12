@@ -3,6 +3,7 @@
 #include <QString>
 #include <QStringList>
 #include <QSettings>
+
 extern QList<QStringList> global_data;
 extern int global_playernum;
 extern int global_totaldist;

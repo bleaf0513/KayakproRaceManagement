@@ -10,15 +10,16 @@
 #include <QVariantMap>
 
 struct KayakConsole {
+
     QString name;
     QString address;
     QBluetoothDeviceInfo deviceInfo;
-
+    int id;
     QLowEnergyController *controller = nullptr;
     QLowEnergyService *ftmsService = nullptr;
     QLowEnergyCharacteristic metricsChar;
     QLowEnergyCharacteristic resistanceLevelChar;
-
+   int connectionAttempts = 0;   // <-- Not a Qt class, no header
     // KP3902 metrics
     quint16 flags = 0;
     quint8 strokeRate = 0;
@@ -30,7 +31,6 @@ struct KayakConsole {
     quint16 kcal = 0;
     quint8 heartRate = 0;
     quint16 elapsedTime = 0;
-
     QByteArray buffer; // accumulate fragmented packets
 
     bool updateMetrics(const QByteArray &value) {
@@ -66,13 +66,13 @@ struct KayakConsole {
         return map;
     }
 };
-
+extern QList<KayakConsole> consoles;
 class BluetoothManager : public QObject
 {
     Q_OBJECT
 public:
     explicit BluetoothManager(QObject *parent = nullptr);
-
+void rebootBluetoothAdapter();
     Q_INVOKABLE void startScan();
     Q_INVOKABLE void setResistance(int consoleIndex, int level);
     Q_INVOKABLE QVariantMap getMetrics(int consoleIndex);
@@ -84,8 +84,9 @@ private slots:
 
 private:
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
-    QList<KayakConsole> consoles;
 
+
+    const int maxAttempts = 5;
     void connectConsole(KayakConsole *console);
 };
 

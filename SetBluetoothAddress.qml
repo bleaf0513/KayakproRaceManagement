@@ -31,7 +31,7 @@ Page  {
         width:1920
         height:1080
 
-        source:"qrc:/images/device_connect.png"
+        source:"images/device_connect.png"
     }
 //    onClosing:
 //    {

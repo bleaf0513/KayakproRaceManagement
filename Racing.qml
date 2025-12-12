@@ -172,13 +172,13 @@ Page {
         //anchors.fill: parent
         width:1920
         height:1080
-        source:"qrc:/images/race_background.png"
+        source:"images/race_background.png"
     }
     Image {
         x:1568
         y:109
 
-        source:"qrc:/images/race_result.png"
+        source:"images/race_result.png"
         Column{
             x:12
             y:46
@@ -287,7 +287,7 @@ Page {
         y:110
         width:6
         height:740
-        source:"qrc:/images/end_line.svg"
+        source:"images/end_line.svg"
     }
     Image {
         id:first_line
@@ -295,7 +295,7 @@ Page {
         y:110
         width:6
         height:740
-        source:"qrc:/images/end_line.svg"
+        source:"images/end_line.svg"
     }
     Column{
         x:91
@@ -310,7 +310,7 @@ Page {
                 z:4
                 width:1920
                 height:740/_rows
-                source:index<_rows? "qrc:/images/each_lane_rect.svg":""
+                source:index<_rows? "images/each_lane_rect.svg":""
             }
         }
     }
@@ -326,7 +326,7 @@ Page {
 
                 Image {
                     z:4
-                    source: "qrc:/images/race_label.svg"
+                    source: "images/race_label.svg"
                     Rectangle{
                         anchors.fill: parent
                         color:index===5?"#EF4444":index===3?"#FACC15":Qt.rgba(1,1,1,1)
@@ -501,21 +501,21 @@ Page {
 
             Image {
                 id:race_line
-                source:"qrc:/images/race_line.png"
+                source:"images/race_line.png"
                 z:10
 
                 Image {
                     x:5
                     y:41*10/_rows
                     z:4
-                    source:index<_rows? "qrc:/images/race_vector_line.svg":""
+                    source:index<_rows? "images/race_vector_line.svg":""
 
                     Image {
                         id:player_distance_img
                         z:5
                         x:4
                         width:index<_rows?seq.x:0////////////////////player racing distance
-                        source:index<_rows? "qrc:/images/race_vector_passed.svg":""
+                        source:index<_rows? "images/race_vector_passed.svg":""
                         // Behavior on width {
                         //     NumberAnimation { duration: 1 } // almost instant but forces refresh
                         // }
@@ -547,7 +547,7 @@ Page {
                         Sprite {
                             name: "paddle"
 
-                            source: index<_rows? "qrc:/images/player_sprite.png":""
+                            source: index<_rows? "images/player_sprite.png":""
                             frameCount: 12
                             frameWidth: 467
                             frameHeight: 242
@@ -587,7 +587,7 @@ Page {
                     //     z:5
                     //     y:-height/2
                     //     x:seq.width+seq.x-20
-                    //     source:index<_rows? "qrc:/images/player_name_rect.svg":""
+                    //     source:index<_rows? "images/player_name_rect.svg":""
                     // }
                 }
 

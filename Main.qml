@@ -66,7 +66,7 @@ Page {
         //anchors.fill: parent
         width:1920
         height:1080
-        source:"qrc:/images/main_background.png"
+        source:"images/main_background.png"
     }
     Image {
         //anchors.fill: parent
@@ -74,7 +74,7 @@ Page {
         y:294
         width:47.8
         height:649.8
-        source:"qrc:/images/main_number.svg"
+        source:"images/main_number.svg"
     }
     // Label { x:left_field.width/5;y:left_field.height/30;text: "ActivePlayers:"; color: "blue"; font.pixelSize: _pixelSize }
     // Label {
@@ -168,7 +168,7 @@ Page {
             SharedData.setTotalDist(totaldist);
             SharedData.writeProfile();
             if (stack) {
-                var comp = Qt.createComponent("qrc:/qml/Racing.qml");
+                var comp = Qt.createComponent("Racing.qml");
                 if (comp.status === Component.Ready) {
                     var page = comp.createObject(stack, {
                         stack: stack
@@ -272,7 +272,7 @@ Page {
             // Hide current window
            // main_window.visible = false
             // Load Main.qml
-           // setblueloader.source = "qrc:/qt/qml/GSMKayakpro/SetBluetoothAddress.qml"
+           // setblueloader.source = "qt/qml/GSMKayakpro/SetBluetoothAddress.qml"
         }
 
     }
@@ -563,14 +563,14 @@ Page {
                     id:connected
                     width:181
                     height:48
-                    source: "qrc:/images/CONNECTED.svg"
+                    source: "images/CONNECTED.svg"
                     visible:false
                 }
                 Image {
                     id:connecting
                     width:181
                     height:48
-                    source: "qrc:/images/CONNECTING.svg"
+                    source: "images/CONNECTING.svg"
                     visible:true
                     Rectangle {
                         x:24
@@ -582,7 +582,7 @@ Page {
                         Image {
                             id: spinner
                             anchors.centerIn: parent
-                            source: "qrc:/images/spin.svg"   // your spinner image
+                            source: "images/spin.svg"   // your spinner image
 
 
                             NumberAnimation on rotation {
@@ -598,7 +598,7 @@ Page {
                     id:failed
                     width:181
                     height:48
-                    source: "qrc:/images/FAILED.svg"
+                    source: "images/FAILED.svg"
                     visible:false
                 }
             }
@@ -663,7 +663,7 @@ Page {
                 Image {
                     width:56
                     height:56
-                    source: "qrc:/images/bluetooth.png"
+                    source: "images/bluetooth.png"
 
                 }
                 ColumnLayout {
