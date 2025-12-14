@@ -13,7 +13,7 @@ Page  {
     //      flags: Qt.FramelessWindowHint
     property StackView stack
     property int consoleCount: 10
-    property var blueNames: Array(consoleCount).fill("")
+    //property var blueNames: Array(consoleCount).fill("")
     property var macAddresses: Array(consoleCount).fill("")
     // Colors
     readonly property color bgColor: "#121212"
@@ -52,7 +52,7 @@ Page  {
         for(var i=0;i<consoleCount;i++)
         {
 
-            blueNames[i]=SharedData.blueNames(i);
+            //blueNames[i]=SharedData.blueNames(i);
             macAddresses[i]=SharedData.blueMacAddress(i);
         }
         showMaximized()
@@ -104,11 +104,11 @@ Page  {
     }
 
     RowLayout {
-        spacing: 20
+        spacing: 1600//20
         //  Layout.alignment: Qt.AlignHCenter
         // Layout.fillWidth: true
-        y:700//1016//parent.height*0.8
-        x:1648//parent.width*0.5
+        y:1016//1016//parent.height*0.8
+        x:48//1648//parent.width*0.5
         Rectangle {
             Layout.preferredWidth: 110//root.width / 10
             Layout.preferredHeight: 44//root.height / 25
@@ -117,7 +117,7 @@ Page  {
 
             Text {
                 anchors.centerIn: parent
-                text: "Exit"
+                text: "Back"
                 font.pixelSize: 20
                 font.bold: true
                 color: "#FFFFFF"
@@ -129,7 +129,7 @@ Page  {
                 hoverEnabled: true
                 onEntered: parent.color = accentHover
                 onExited: parent.color = accentGreen
-                onClicked: Qt.quit()//saveAllMacAddresses()
+                onClicked: stack.pop()//Qt.quit()//saveAllMacAddresses()
             }
         }
         // Next Button
@@ -157,7 +157,7 @@ Page  {
                     for(var i=0;i<consoleCount;i++)
                     {
 
-                        SharedData.setBlueMacAddress(i,blueNames[i],macAddresses[i]);
+                        SharedData.setBlueMacAddress(i,macAddresses[i]);
                     }
                     SharedData.setConfirmSetting(1);
                     stack.pop();

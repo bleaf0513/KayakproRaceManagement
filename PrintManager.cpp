@@ -45,6 +45,7 @@ QString PrintManager::saveCsvFile(const QString &fileName, const QStringListList
 
     for (const QStringList &row : rows) {
         // Escape commas by quoting the field if necessary
+        qWarning()<<"DDDD"<<row;
         QStringList escapedRow;
         for (const QString &field : row) {
             QString s = field;

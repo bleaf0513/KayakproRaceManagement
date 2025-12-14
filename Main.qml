@@ -154,7 +154,7 @@ Page {
                 var item = eachplayerinfo.children[i];
                 if (!item) continue;
 
-                SharedData.setSharedItem(i,0,item.number);
+                //SharedData.setSharedItem(i,0,item.number);
                 SharedData.setSharedItem(i,1,item.firstName);
                 SharedData.setSharedItem(i,2,item.surName);
                 SharedData.setSharedItem(i,3,item.clubValue);
@@ -188,6 +188,7 @@ Page {
         }
 
     }
+/*
     Button {
         x:1572
         y:1016
@@ -241,7 +242,7 @@ Page {
         }
 
     }
-
+*/
     // ----- Button 2 -----
     Button {
         x:48
@@ -270,6 +271,7 @@ Page {
             verticalAlignment: Text.AlignVCenter
         }
         onClicked:{
+            stack.pop();
             // Hide current window
            // main_window.visible = false
             // Load Main.qml

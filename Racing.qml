@@ -7,10 +7,10 @@ Page {
     id: second_window
     width: 1920//Screen.width * 0.95
     height: 1080//Screen.height * 0.95
-        property StackView stack
-  //  visible: true
-  //  title: "Racing UI"
- //   flags: Qt.FramelessWindowHint
+    property StackView stack
+    //  visible: true
+    //  title: "Racing UI"
+    //   flags: Qt.FramelessWindowHint
     property int _rows: SharedData.getPlayerNum()
     //property var player_name: ["Jhon","Iris","Tiger","Wolf","Cat","Dog","Fish","House","Codemaster","Engineer"]
     //property var ranking_number: [1,2,3,4,5,6,7,8,9,10]
@@ -35,17 +35,18 @@ Page {
     property var ranking:[0,1,2,3,4,5,6,7,8,9]
     property var passed_dist:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
     property var device_dist:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    property int race_end_flag:0
     Component.onCompleted:{
 
         showMaximized()
         total_dist = SharedData.getTotalDist();
         //race_label_num=total_dist/5;
     }
-//    onClosing:
-//    {
-//        console.log("ComponentDestruction:")
-//        Qt.quit()
-//    }
+    //    onClosing:
+    //    {
+    //        console.log("ComponentDestruction:")
+    //        Qt.quit()
+    //    }
     Button {
         x:248
         y:47
@@ -72,8 +73,11 @@ Page {
             verticalAlignment: Text.AlignVCenter
         }
         onClicked:{
-            printManager.saveCsv()
-            printManager.printCsv("race_record.csv")
+            if(race_end_flag==1)
+            {
+                printManager.saveCsv()
+                printManager.printCsv("race_record.csv")
+            }
         }
 
     }
@@ -482,7 +486,12 @@ Page {
             }
             if(race_end_state==0)
             {
-
+                for (i = 0; i < _rows; i++) {
+                    SharedData.setSharedItem(i,10,String(total_dist));
+                    SharedData.setSharedItem(i,11,race_end_time[i].text);
+                    SharedData.setSharedItem(i,12,String(ranking[i]));
+                }
+                race_end_flag=1;
                 countdownTimer.stop();
                 stop();
             }

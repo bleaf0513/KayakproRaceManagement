@@ -12,17 +12,20 @@ SharedData::SharedData(QObject *parent) : QObject(parent) {
 
     if(global_data.size()==0)
     {
-    global_data.resize(10+1);
-    QStringList foot_data = { "No","First Name","Surname","Club","M/F","Cat","Weight","DOB","MAC","Active","BLUENAME"};
-    global_data[0]= foot_data;
+        global_data.resize(10+1);
+        QStringList foot_data = { "No","First Name","Surname","Club","M/F","Cat","Weight","DOB","MAC","Active","Distance","Time","Ranking"};
+        global_data[0]= foot_data;
 
-    for(int i=1;i<=10;i++)
-    {
-        global_data[i].resize(11);
-       // global_data[i].replace(8,"");
-        global_data[i].replace(9,"0");
-        global_data[i].replace(10,"");
-    }
+        for(int i=1;i<=10;i++)
+        {
+            global_data[i].resize(13);
+            // global_data[i].replace(8,"");
+            global_data[i].replace(BLUEACTIVE,"0");
+            global_data[i].replace(LANE,QString::number(i));
+            global_data[i].replace(LACEDIST,"0");
+            global_data[i].replace(LACETIME,"0");
+            global_data[i].replace(RANKING,"0");
+        }
     }
 }
 void SharedData::setTotalDist(int dist){global_totaldist=dist;}
@@ -72,6 +75,7 @@ void SharedData::readProfile()
     {
         QString prefix = QString("player%1/").arg(i+1);
         global_data[i+1].replace(LANE,QString::number(i+1));
+        qWarning()<<"DDDSSS"<<global_data[i+1].at(LANE);
         // Load values directly
         global_data[i+1].replace(FIRSTNAME, settings.value(prefix + "firstname", "").toString());
         global_data[i+1].replace(SURNAME,   settings.value(prefix + "surname", "").toString());
@@ -105,16 +109,16 @@ QString SharedData::blueMacAddress(int consoleIndex)  {
     //qDebug() << "Console:blue"<<consoleIndex<<":"<<add;
     return add;
 }
-QString SharedData::blueNames(int consoleIndex)  {
-    if (consoleIndex < 0 || consoleIndex >= 10)
-        return "";
-    QSettings settings("KayakPro", "BlueName");
-    QString prefix = QString("%1").arg(consoleIndex);
-    QString add=settings.value(prefix, "").toString();
-    global_data[consoleIndex+1].replace(BLUENAME,add);
-    qDebug() << "Console:blueName"<<consoleIndex<<":"<<add;
-    return add;
-}
+// QString SharedData::blueNames(int consoleIndex)  {
+//     if (consoleIndex < 0 || consoleIndex >= 10)
+//         return "";
+//     QSettings settings("KayakPro", "BlueName");
+//     QString prefix = QString("%1").arg(consoleIndex);
+//     QString add=settings.value(prefix, "").toString();
+//     global_data[consoleIndex+1].replace(BLUENAME,add);
+//     qDebug() << "Console:blueName"<<consoleIndex<<":"<<add;
+//     return add;
+// }
 QString SharedData::playerName(int consoleIndex)  {
     if (consoleIndex < 0 || consoleIndex >= 10)
         return "";
