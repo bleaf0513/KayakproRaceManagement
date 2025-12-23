@@ -43,7 +43,7 @@ public:
     Q_INVOKABLE int getStrokeCount(int consoleIndex);
     Q_INVOKABLE void setPlayerNum(int nn);
     Q_INVOKABLE void setBlueMacAddress(int consoleIndex, const QVariant &mac) {
-        if (consoleIndex < 0 || consoleIndex >= 9)
+        if (consoleIndex < 0 || consoleIndex > 9)
             return;
             m_macAddresses[consoleIndex] = mac.toString();
         // qWarning()<<"BlueName"<<m_blueNames[consoleIndex];

@@ -63,6 +63,7 @@ qt_add_qml_module(appGSMKayakpro
     RESOURCES images/analytics_mark.png images/bluetooth.png images/bluetooth_mark.png images/check_icon.svg images/CONNECTED.svg images/Connecting.svg images/customize_mark.png images/device_connect.png images/each_lane_rect.svg images/end_line.png images/end_line.svg images/ExitApplication.svg images/FAILED.svg images/FirstScreen.png images/icon.png images/kayak_sprite.png images/main_background.png images/main_number.svg images/player_sprite.png images/race_background.png images/race_label.svg images/race_line.png images/race_result.png images/race_vector_line.svg images/race_vector_passed.svg images/spin.svg
     RESOURCES app_icon.rc
     RESOURCES app_icon.ico
+    RESOURCES images/mini_button.png
 
 
 )

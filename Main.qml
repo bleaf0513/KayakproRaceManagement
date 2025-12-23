@@ -13,6 +13,7 @@ Page {
     //        flags: Qt.FramelessWindowHint
     id:main_window
     property StackView stack
+   // anchors.fill:parent
     //   title: "Setting..."
     property int _pixelSize:main_window.height/35
     property int _divided_num:6
@@ -271,6 +272,23 @@ Page {
             verticalAlignment: Text.AlignVCenter
         }
         onClicked:{
+            for (var i = 0; i < 10; i++) {
+                var item = eachplayerinfo.children[i];
+                if (!item) continue;
+
+                //SharedData.setSharedItem(i,0,item.number);
+                SharedData.setSharedItem(i,1,item.firstName);
+                SharedData.setSharedItem(i,2,item.surName);
+                SharedData.setSharedItem(i,3,item.clubValue);
+                SharedData.setSharedItem(i,4,item.sex);
+                SharedData.setSharedItem(i,5,item.catValue);
+                SharedData.setSharedItem(i,6,item.weight);
+                SharedData.setSharedItem(i,7,item.dobValue);
+            }
+            var totaldist=parseInt(total_distance.text)
+
+            SharedData.setTotalDist(totaldist);
+            SharedData.writeProfile();
             stack.pop();
             // Hide current window
            // main_window.visible = false
@@ -617,7 +635,7 @@ Page {
     // }
     // Root Layout to split into two sections (left and right)
     Component.onCompleted: {
-        showMaximized()
+
         SharedData.readProfile();
         bluetoothManager.startScan();  // Automatically call startScan when the component is fully loaded
     }

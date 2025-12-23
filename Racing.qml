@@ -5,8 +5,8 @@ import com.kayakpro.print 1.0
 import shareddataApp 1.0
 Page {
     id: second_window
-    width: 1920//Screen.width * 0.95
-    height: 1080//Screen.height * 0.95
+   // width: 1920//Screen.width * 0.95
+   // height: 1080//Screen.height * 0.95
     property StackView stack
     //  visible: true
     //  title: "Racing UI"
@@ -38,7 +38,7 @@ Page {
     property int race_end_flag:0
     Component.onCompleted:{
 
-        showMaximized()
+      //  showMaximized()
         total_dist = SharedData.getTotalDist();
         //race_label_num=total_dist/5;
     }
@@ -440,7 +440,7 @@ Page {
         onTriggered: {
             for(var i=0;i<_rows;i++)
             {
-                device_dist[i]= start_dist[i]-SharedData.getDistance(i);
+                device_dist[i]= Math.abs(start_dist[i]-SharedData.getDistance(i));
             }
 
             race_end_state=0;

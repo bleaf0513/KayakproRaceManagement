@@ -6,8 +6,8 @@ import shareddataApp 1.0
 import com.kayakpro.bluetooth 1.0
 Page  {
     id: root
-    width: 1920//Screen.width - 20
-    height: 1080//Screen.height - 50
+
+
     //  visible: true
     // title: "KP3902 MAC Address Settings"
     //      flags: Qt.FramelessWindowHint
@@ -15,6 +15,7 @@ Page  {
     property int consoleCount: 10
     //property var blueNames: Array(consoleCount).fill("")
     property var macAddresses: Array(consoleCount).fill("")
+ //   anchors.fill: parent
     // Colors
     readonly property color bgColor: "#121212"
     readonly property color cardColor: "#1E1E2A"
@@ -48,14 +49,12 @@ Page  {
     }
 
     Component.onCompleted:{
-
         for(var i=0;i<consoleCount;i++)
         {
 
             //blueNames[i]=SharedData.blueNames(i);
             macAddresses[i]=SharedData.blueMacAddress(i);
         }
-        showMaximized()
     }
     // Rectangle {
     //     anchors.fill: parent

@@ -44,12 +44,10 @@ int main(int argc, char *argv[])
     // 7. Check if the engine loaded correctly
     if (engine.rootObjects().isEmpty())
         return -1;
-    QObject *rootObject = engine.rootObjects().first();
-
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(rootObject);
+    QQuickWindow *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first());
     window->setIcon(QIcon("app_icon.ico"));
     if (window) {
-        window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        window->setFlags(Qt::Window | Qt::FramelessWindowHint);
         window->showFullScreen();
     }
 
